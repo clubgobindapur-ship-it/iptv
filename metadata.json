@@ -1,0 +1,8 @@
+{
+  "name": "Shameem IPTV",
+  "description": "A premium live television streaming app featuring categorised channels, responsive search, bookmarking, and an automated featured banner slideshow carousel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

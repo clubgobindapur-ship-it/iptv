@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  /* Primary shameem theme custom variables */
+  --color-shameem-red: #ff1a1a;
+  --color-shameem-dark: #0a0a0c;
+  --color-shameem-panel: #141419;
+  --color-shameem-accent: #ff3333;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-shameem-dark);
+  color: #f3f4f6;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbars for side panels and lists */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(20, 20, 25, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 26, 26, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 26, 26, 0.6);
+}
