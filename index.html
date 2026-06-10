@@ -1,13 +1,200 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Shameem IPTV</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shameem IPTV</title>
 
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome vector icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  
+  <!-- HLS Player CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+  <!-- MAIN FULL-SCREEN CONTAINER -->
+  <div class="app-container">
+    
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="header-content">
+        <!-- Logo and brand text -->
+        <div class="header-brand">
+          <div class="header-logo-container">
+            <i class="fa-solid fa-tv"></i>
+          </div>
+          <div class="brand-text">
+            <h1>SHAMEEM <span>IPTV</span></h1>
+            <p>PREMIUM LIVE TELEVISION NETWORK</p>
+          </div>
+        </div>
+
+        <!-- Real-time metrics inside header -->
+        <div class="system-status">
+          <div class="status-badge live" id="totalFeedsBadge">
+            <i class="fa-solid fa-circle"></i> CONNECTED
+          </div>
+          <div class="status-badge" id="currentTimeBadge">
+            --:--:--
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY STAGE -->
+    <main class="main-content">
+      
+      <!-- PLAYER REGION (LEFT PANEL) -->
+      <section class="player-section" id="playerSection">
+        
+        <!-- Video Screen Box -->
+        <div class="player-wrapper" id="shameem-player-box">
+          <div class="video-container">
+            <!-- Video Media component -->
+            <video id="video" class="video-player" autoplay playsinline onclick="togglePlay()"></video>
+            
+            <!-- Loader Buffer Loop -->
+            <div class="video-loader" id="videoLoader">
+              <div class="spinner"></div>
+              <span class="loader-text">Loading Feed Stream...</span>
+            </div>
+
+            <!-- Failure stream overlay -->
+            <div class="player-error-overlay" id="playerErrorOverlay" style="display: none;">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <div class="error-title">Source Playback Offline</div>
+              <div class="error-desc">This M3U stream URL is temporarily unreachable or requires active VPN. Please try reloading the network stream or choosing another channel from the explorer.</div>
+              <button class="btn-reload" id="btnReload">Retry Stream</button>
+            </div>
+
+            <!-- Custom Controls HUD Overlay -->
+            <div class="player-controls">
+              <div class="controls-left">
+                <button class="btn-control" onclick="prevChannel()" title="Previous Channel">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="btn-control btn-play" id="btnPlay" onclick="togglePlay()" title="Play/Pause">
+                  <i class="fas fa-play"></i>
+                </button>
+                <button class="btn-control" onclick="nextChannel()" title="Next Channel">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+
+                <!-- Volume level HUD -->
+                <div class="volume-hud">
+                  <button class="btn-mute" id="btnMute" onclick="toggleMute()" style="background:none; border:none; color:white; cursor:pointer;" title="Mute/Unmute">
+                    <i class="fa-solid fa-volume-high"></i>
+                  </button>
+                  <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.80" oninput="setVolume(this.value)">
+                </div>
+              </div>
+
+              <!-- HUD Right controls -->
+              <div class="controls-right">
+                <button class="btn-control" onclick="toggleFullscreen()" title="Fullscreen mode">
+                  <i class="fa-solid fa-expand"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHANNEL METADATA HUD BAR -->
+        <div class="channel-info">
+          <div class="info-content">
+            <span class="channel-status-label">
+              <span class="pulse"></span> LIVE BROADCAST FEED
+            </span>
+            <h2 id="currentChannelName" class="channel-name">Loading station...</h2>
+            <p id="currentChannelCategory" class="channel-category">General</p>
+          </div>
+
+          <!-- Add/Remove Favorite Button -->
+          <button class="btn-save-meta" id="btnSaveMeta" title="Save this channel to Favorites">
+            <i class="fa-regular fa-heart"></i> Add to Favorites
+          </button>
+        </div>
+
+        <!-- FEATURED BANNER IMAGE CAROUSEL (3 SEC AUTOSLIDER WHEEL) -->
+        <div class="banners-section">
+          <div class="banners-header-strip">
+            <h3 class="banners-title"><i class="fa-solid fa-star"></i> Featured Broadcast Showcases</h3>
+            <div class="banners-carousel-dots" id="bannerDotsContainer">
+              <!-- Inline JS dynamic slide dots indicators added here -->
+            </div>
+          </div>
+
+          <!-- Slider Frame -->
+          <div class="banners-carousel" id="carouselWrapper">
+            <!-- Left Manual trigger arrow -->
+            <button class="carousel-btn carousel-btn-prev" onclick="scrollBannersPrev()" title="Previous">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <div class="banners-viewport">
+              <div class="banners-container" id="bannersContainer"></div>
+            </div>
+            
+            <!-- Right Manual trigger arrow -->
+            <button class="carousel-btn carousel-btn-next" onclick="scrollBannersNext()" title="Next">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SIDEBAR TELEVISION FEED DIRECTORY (RIGHT SIDE) -->
+      <aside class="sidebar">
+        
+        <!-- Search Input -->
+        <div class="sidebar-search">
+          <input 
+            type="text" 
+            id="search" 
+            class="search-input" 
+            placeholder="Type channel name, category...">
+          <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <!-- Categories horizontal sliding strip with sub controllers -->
+        <div class="flex-column-gap">
+          <div class="category-heading-area">
+            <label>CHANNELS CATEGORY</label>
+            <div class="category-scroll-arrows">
+              <button class="arrow-mini" onclick="scrollCategories('left')"><i class="fa-solid fa-chevron-left"></i></button>
+              <button class="arrow-mini" onclick="scrollCategories('right')"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+          </div>
+          <!-- Horizontal filter slots -->
+          <div class="categories-horizontal" id="categoryFilter"></div>
+        </div>
+
+        <!-- Channels Grid list -->
+        <div class="channels-container">
+          <div class="channel-list-info" id="channelsCountText">
+            DISPLAYING 0 FEEDS
+          </div>
+          <div class="channel-list" id="channelGrid"></div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <p>&copy; 2026 SHAMEEM IPTV SYSTEMS • REAL-TIME M3U VIDEO NETWORKS • INTERACTIVE VANILLA MEDIA ENGINE</p>
+    </footer>
+  </div>
+
+  <!-- Vanilla script logic loader -->
+  <script src="/script.js"></script>
+</body>
+</html>
