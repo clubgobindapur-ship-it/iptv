@@ -102,7 +102,8 @@ const dom = {
   btnSaveMeta: null,
   totalFeedsBadge: null,
   currentTimeBadge: null,
-  channelsCountText: null
+  channelsCountText: null,
+  marqueeNotice: null
 };
 
 // ============================================================
@@ -119,6 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
   loadPlaylist();
   renderBanners();
   startAutoSlider();
+
+  // Asynchronously query Firebase for dynamic elements
+  fetchFirebaseData();
 });
 
 function cacheElements() {
@@ -142,6 +146,7 @@ function cacheElements() {
   dom.totalFeedsBadge = document.getElementById('totalFeedsBadge');
   dom.currentTimeBadge = document.getElementById('currentTimeBadge');
   dom.channelsCountText = document.getElementById('channelsCountText');
+  dom.marqueeNotice = document.getElementById('marqueeNotice');
 }
 
 // Setup interaction hooks
@@ -734,3 +739,63 @@ window.toggleFullscreen = toggleFullscreen;
 window.scrollBannersPrev = prevBannerSlide;
 window.scrollBannersNext = nextBannerSlide;
 window.scrollCategories = scrollCategories;
+
+// ============================================================
+// DYNAMIC FIREBASE INTEGRATION
+// ============================================================
+async function fetchFirebaseData() {
+  const db = window.db;
+  if (!db) {
+    console.log("Firestore is offline or has placeholders. Showing default high-fidelity showcases and local marquee ticker.");
+    return;
+  }
+
+  // 1. Fetch live Left-to-Right Scrolling Marquee Notice
+  try {
+    const noticeDoc = await db.collection('settings').doc('notice').get();
+    if (noticeDoc.exists) {
+      const data = noticeDoc.data();
+      if (data && data.message) {
+        console.log("Dynamic marquee notice downloaded from Firestore:", data.message);
+        if (dom.marqueeNotice) {
+          dom.marqueeNotice.textContent = data.message;
+        }
+      }
+    } else {
+      console.log("No dynamic notice found at settings/notice in Firestore. Using default greeting.");
+    }
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('permission')) {
+      console.warn("Firestore access denied. Verify security rules:", error.message);
+    } else {
+      console.warn("Could not retrieve custom notice from Firestore, using default notice. Check credentials:", error);
+    }
+  }
+
+  // 2. Fetch live Promoted Slides Banners Showcase
+  try {
+    const querySnapshot = await db.collection('banners').get();
+    const loadedBanners = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data && data.bannerURL && data.title && data.description) {
+        loadedBanners.push({
+          bannerURL: data.bannerURL,
+          redirection: data.redirection || '',
+          title: data.title,
+          description: data.description
+        });
+      }
+    });
+
+    if (loadedBanners.length > 0) {
+      console.log(`Successfully fetched ${loadedBanners.length} promotional banners from Firestore.`);
+      state.banners = loadedBanners;
+      renderBanners();
+    } else {
+      console.log("Firestore banners collection is empty. Utilizing default high-quality showcases.");
+    }
+  } catch (error) {
+    console.warn("Could not retrieve dynamic banners from Firestore, using standard showcases. Check credentials:", error);
+  }
+}

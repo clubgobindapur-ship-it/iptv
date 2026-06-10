@@ -24,6 +24,16 @@
   <!-- MAIN FULL-SCREEN CONTAINER -->
   <div class="app-container">
     
+    <!-- MARQUEE NOTICE BAR -->
+    <div class="marquee-notice-bar" id="noticeBarContainer">
+      <div class="notice-badge">
+        <i class="fa-solid fa-bullhorn"></i> NOTICE
+      </div>
+      <div class="marquee-wrapper">
+        <marquee direction="right" scrollamount="4" id="marqueeNotice">Welcome to Shameem IPTV! Loading live announcement tickers from firestore database...</marquee>
+      </div>
+    </div>
+    
     <!-- HEADER -->
     <header class="app-header">
       <div class="header-content">
@@ -193,6 +203,13 @@
       <p>&copy; 2026 SHAMEEM IPTV SYSTEMS • REAL-TIME M3U VIDEO NETWORKS • INTERACTIVE VANILLA MEDIA ENGINE</p>
     </footer>
   </div>
+
+  <!-- Firebase Core SDK and Firestore (Compatible v10 CDN Client) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase Config Loader -->
+  <script src="/firebase-config.js"></script>
 
   <!-- Vanilla script logic loader -->
   <script src="/script.js"></script>

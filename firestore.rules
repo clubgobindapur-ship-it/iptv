@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default deny security firewall
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Public readable scrolling notice message
+    match /settings/notice {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Public readable sliding banners list
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

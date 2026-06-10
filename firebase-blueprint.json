@@ -1,0 +1,50 @@
+{
+  "entities": {
+    "notice": {
+      "title": "Notice",
+      "description": "Notice message displayed on top as a scrolling marquee",
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "Preset message shown from left to right marquee"
+        }
+      },
+      "required": ["message"]
+    },
+    "banner": {
+      "title": "Banner",
+      "description": "Featured broadcast showcase slide banner item",
+      "type": "object",
+      "properties": {
+        "bannerURL": {
+          "type": "string",
+          "description": "Image URL for the slide cover"
+        },
+        "redirection": {
+          "type": "string",
+          "description": "Channel name or trigger to play on click"
+        },
+        "title": {
+          "type": "string",
+          "description": "Theme or highlight heading"
+        },
+        "description": {
+          "type": "string",
+          "description": "Paragraph detailing show context"
+        }
+      },
+      "required": ["bannerURL", "title", "description", "redirection"]
+    }
+  },
+  "firestore": {
+    "/settings/notice": {
+      "schema": "notice",
+      "description": "Notice configuration containing marquee ticker string"
+    },
+    "/banners/{bannerId}": {
+      "schema": "banner",
+      "description": "Collection of sliding banner slideshow showcases"
+    }
+  }
+}
